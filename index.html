@@ -190,12 +190,12 @@
             <div class="input-group">
                 <div class="input-field">
                     <label for="minutes">Minutos</label>
-                    <input type="number" id="minutes" min="0" max="59" value="25">
+                    <input type="number" id="minutes" min="0" value="25">
                 </div>
                 
                 <div class="input-field">
                     <label for="seconds">Segundos</label>
-                    <input type="number" id="seconds" min="0" max="59" value="0">
+                    <input type="number" id="seconds" min="0" value="0">
                 </div>
             </div>
             
@@ -228,11 +228,16 @@
             
             // Atualizar o display do timer
             function updateDisplay() {
-                const minutes = Math.floor(timerTime / 60);
+                const hours = Math.floor(timerTime / 3600);
+                const minutes = Math.floor((timerTime % 3600) / 60);
                 const seconds = timerTime % 60;
                 
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
+                if (hours > 0) {
+                    timerDisplay.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+
                 // Ativar animação de alarme quando o timer chegar a zero
                 if (timerTime === 0) {
                     timerDisplay.classList.add('alarm');
@@ -314,8 +319,8 @@
                 const seconds = parseInt(secondsInput.value) || 0;
                 
                 // Validar os valores
-                if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) {
-                    alert('Por favor, insira valores válidos (minutos: 0-59, segundos: 0-59)');
+                if (minutes < 0 || seconds < 0) {
+                    alert('Por favor, insira valores positivos para minutos e segundos.');
                     return;
                 }
                 
