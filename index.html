@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer em JavaScript</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(140deg, #ad7907, #e0a627, #f5e3bd);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 120px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 10800px;
+        }
+        
+        h1 {
+            color: #19232e;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        .timer-display {
+            font-size: clamp(4.5rem, 20vw, 40rem);
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 25px 0;
+            font-family: 'Courier New', monospace;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin: 15px;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .start-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .start-btn:hover:not(:disabled) {
+            background: linear-gradient(to right, #27ae60, #219653);
+            transform: translateY(-2px);
+        }
+        
+        .pause-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .pause-btn:hover:not(:disabled) {
+            background: linear-gradient(to right, #c0392b, #a23526);
+            transform: translateY(-2px);
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .reset-btn:hover:not(:disabled) {
+            background: linear-gradient(to right, #2980b9, #1c6ea4);
+            transform: translateY(-2px);
+        }
+        
+        .time-input {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .input-field label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .input-field input {
+            width: 80px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .set-btn {
+            background: linear-gradient(to right, #5967b6, #4475ad);
+            color: white;
+            padding: 12px 30px;
+            margin-top: 10px;
+        }
+        
+        .set-btn:hover {
+            background: linear-gradient(to right, #5967b6, #5967b6);
+            transform: translateY(-2px);
+        }
+        
+        .message-display {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 5.0rem;
+            min-height: 1.5rem; /* Evita que o layout mude de posição */
+        }
+
+        .alarm {
+            animation: alarmAnimation 1s infinite;
+        }
+        
+        @keyframes alarmAnimation {
+            0% { color: #2c3e50; }
+            50% { color: #e74c3c; }
+            100% { color: #2c3e50; }
+        }
+        
+        @media (max-width: 500px) {
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .input-field input {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TEMPO</h1>
+        
+        <div class="timer-display" id="timer">25:00</div>
+        
+        <div id="message" class="message-display"></div>
+
+        <div class="time-input">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="minutes">Minutos</label>
+                    <input type="number" id="minutes" min="0" max="59" value="25">
+                </div>
+                
+                <div class="input-field">
+                    <label for="seconds">Segundos</label>
+                    <input type="number" id="seconds" min="0" max="59" value="0">
+                </div>
+            </div>
+            
+            <button class="btn set-btn" id="setBtn">Definir Tempo</button>
+            <div class="controls">
+            <button class="btn start-btn" id="startBtn">Iniciar</button>
+            <button class="btn pause-btn" id="pauseBtn" disabled>Pausar</button>
+            <button class="btn reset-btn" id="resetBtn" disabled>Resetar</button>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM
+            const timerDisplay = document.getElementById('timer');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const minutesInput = document.getElementById('minutes');
+            const secondsInput = document.getElementById('seconds');
+            const setBtn = document.getElementById('setBtn');
+            const messageDisplay = document.getElementById('message');
+            
+            // Variáveis do timer
+            let timerTime = 25 * 60; // 25 minutos em segundos
+            let interval;
+            let isRunning = false;
+            let isPaused = false;
+            
+            // Atualizar o display do timer
+            function updateDisplay() {
+                const minutes = Math.floor(timerTime / 60);
+                const seconds = timerTime % 60;
+                
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Ativar animação de alarme quando o timer chegar a zero
+                if (timerTime === 0) {
+                    timerDisplay.classList.add('alarm');
+                } else {
+                    timerDisplay.classList.remove('alarm');
+                }
+            }
+            
+            // Iniciar o timer
+            function startTimer() {
+                if (isRunning) return;
+                
+                messageDisplay.textContent = '';
+
+                isRunning = true;
+                isPaused = false;
+                
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                resetBtn.disabled = false;
+                minutesInput.disabled = true;
+                secondsInput.disabled = true;
+                setBtn.disabled = true;
+                
+                interval = setInterval(function() {
+                    if (timerTime > 0) {
+                        timerTime--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(interval);
+                        isRunning = false;
+                        messageDisplay.textContent = 'Tempo esgotado!';
+                        startBtn.disabled = false;
+                    }
+                }, 1000);
+            }
+            
+            // Pausar o timer
+            function pauseTimer() {
+                if (!isRunning) return;
+                
+                clearInterval(interval);
+                isRunning = false;
+                isPaused = true;
+                
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+            }
+            
+            // Resetar o timer
+            function resetTimer() {
+                clearInterval(interval);
+                isRunning = false;
+                isPaused = false;
+                
+                // Restaurar o tempo original
+                const minutes = parseInt(minutesInput.value) || 0;
+                const seconds = parseInt(secondsInput.value) || 0;
+                timerTime = minutes * 60 + seconds;
+                
+                updateDisplay();
+                
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                resetBtn.disabled = true;
+                minutesInput.disabled = false;
+                secondsInput.disabled = false;
+                setBtn.disabled = false;
+                
+                timerDisplay.classList.remove('alarm');
+                messageDisplay.textContent = '';
+            }
+            
+            // Definir tempo personalizado
+            function setCustomTime() {
+                if (isRunning) return;
+                
+                const minutes = parseInt(minutesInput.value) || 0;
+                const seconds = parseInt(secondsInput.value) || 0;
+                
+                // Validar os valores
+                if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) {
+                    alert('Por favor, insira valores válidos (minutos: 0-59, segundos: 0-59)');
+                    return;
+                }
+                
+                timerTime = minutes * 60 + seconds;
+                updateDisplay();
+                messageDisplay.textContent = '';
+            }
+            
+            // Event Listeners
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+            setBtn.addEventListener('click', setCustomTime);
+            
+            // Inicializar o display
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
